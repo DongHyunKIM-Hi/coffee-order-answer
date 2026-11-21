@@ -11,10 +11,11 @@ import java.time.LocalDateTime;
 /**
  * 사용자의 포인트 잔액 (1원 = 1P). 처음 충전할 때 만들어진다.
  *
- * [1단계에서 일부러 하지 않는 것]
- * 잔액이 충분한지 확인하지 않는다. use()는 시키는 대로 빼기만 한다.
- * 그래서 잔액보다 비싼 주문도 그대로 통과하려 든다.
- * 잔액 확인은 2단계에서, 여러 요청이 동시에 들어올 때의 보호는 3단계에서 넣는다.
+ * 2단계에서 잔액 확인(canPay, use)을 넣었다. 잔액이 모자라면 차감하지 않는다.
+ *
+ * [2단계에서 아직 하지 않는 것]
+ * 이 확인은 한 요청 안에서만 맞다. 같은 사용자의 요청이 동시에 들어오면
+ * 둘 다 "충분하다"를 통과한 뒤 같은 잔액을 덮어쓴다. → 3단계에서 분산 락으로 막는다.
  */
 @Getter
 @Entity
@@ -37,12 +38,18 @@ public class UserPoint {
     }
 
     public void charge(long amount, LocalDateTime now) {
-        this.balance += amount;
+        this.balance = Math.addExact(this.balance, amount);
         this.updatedAt = now;
     }
 
+    public boolean canPay(long amount) {
+        return balance >= amount;
+    }
+
     public void use(long amount, LocalDateTime now) {
-        // 2단계에서는 여기(그리고 OrderService)에서 잔액을 확인하고 거절한다.
+        if (!canPay(amount)) {
+            throw new IllegalStateException("잔액보다 큰 금액은 차감할 수 없습니다.");
+        }
         this.balance -= amount;
         this.updatedAt = now;
     }

@@ -3,6 +3,7 @@ package com.practicefintech.coffee.domain.order.controller;
 import com.practicefintech.coffee.domain.order.model.request.OrderRequest;
 import com.practicefintech.coffee.domain.order.model.response.OrderResponse;
 import com.practicefintech.coffee.domain.order.service.OrderService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,10 +19,9 @@ public class OrderController {
 
     private final OrderService orderService;
 
-    /** 1단계에는 @Valid가 없다. (2단계에서 추가) */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public OrderResponse order(@RequestBody OrderRequest request) {
+    public OrderResponse order(@Valid @RequestBody OrderRequest request) {
         return orderService.order(request.getUserId(), request.getMenuId());
     }
 }

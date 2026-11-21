@@ -3,6 +3,7 @@ package com.practicefintech.coffee.domain.point.controller;
 import com.practicefintech.coffee.domain.point.model.request.ChargePointRequest;
 import com.practicefintech.coffee.domain.point.model.response.PointResponse;
 import com.practicefintech.coffee.domain.point.service.PointService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,9 +19,8 @@ public class PointController {
 
     private final PointService pointService;
 
-    /** 1단계에는 @Valid가 없다. 어떤 금액이 와도 그대로 받는다. (2단계에서 추가) */
     @PostMapping("/charge")
-    public PointResponse charge(@RequestBody ChargePointRequest request) {
+    public PointResponse charge(@Valid @RequestBody ChargePointRequest request) {
         return pointService.charge(request.getUserId(), request.getAmount());
     }
 

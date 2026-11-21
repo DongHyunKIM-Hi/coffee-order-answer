@@ -1,14 +1,19 @@
 package com.practicefintech.coffee.domain.order.model.request;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-/** 1단계에서는 검증 애너테이션을 붙이지 않는다. (2단계에서 추가) */
 @Getter
 @NoArgsConstructor
 public class OrderRequest {
 
+    @NotNull
+    @Positive
     private Long userId;
 
+    @NotNull
+    @Positive
     private Long menuId;
 }
