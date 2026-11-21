@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface OrderRepository extends JpaRepository<CoffeeOrder, Long> {
 
-    /** 2단계에서 기간 조건을 넣었다. 최근 7일(오늘 포함) 주문만 센다. */
+    /** Redis를 쓸 수 없을 때 인기 메뉴를 직접 집계하는 쿼리 */
     @Query("select o.menuId as menuId, count(o) as orderCount from CoffeeOrder o "
             + "where o.orderedAt >= :since group by o.menuId")
     List<MenuOrderCount> countByMenuSince(@Param("since") LocalDateTime since);
